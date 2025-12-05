@@ -8,7 +8,7 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 # Set environment variables before importing app modules
-os.environ["API_TOKEN"] = "test_token"
+os.environ["JAKETODO_API_TOKEN"] = "test_token"
 os.environ["DATABASE_PATH"] = ":memory:"
 
 from app.database import init_db

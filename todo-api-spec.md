@@ -393,7 +393,7 @@ todo-api/
 
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
-| `API_TOKEN` | Bearer token for authentication | — | Yes |
+| `JAKETODO_API_TOKEN` | Bearer token for authentication | — | Yes |
 | `DATABASE_PATH` | Path to SQLite database file | `./data/todos.db` | No |
 
 ---

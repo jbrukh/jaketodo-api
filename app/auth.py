@@ -9,8 +9,8 @@ security = HTTPBearer()
 async def verify_token(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> str:
-    """Verify the Bearer token matches the configured API_TOKEN."""
-    if credentials.credentials != settings.api_token:
+    """Verify the Bearer token matches the configured JAKETODO_API_TOKEN."""
+    if credentials.credentials != settings.jaketodo_api_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication token",
