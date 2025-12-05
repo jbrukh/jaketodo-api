@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.auth import verify_token
 from app.database import get_db
 from app.models.todo import (
+    TodoBulkCreateRequest,
+    TodoBulkCreateResponse,
     TodoCreate,
     TodoDeleteResponse,
     TodoListResponse,
@@ -21,6 +23,14 @@ async def create_todo(data: TodoCreate, _: str = Depends(verify_token)):
     """Create a new TODO."""
     async with get_db() as db:
         return await todo_service.create_todo(db, data)
+
+
+@router.post("/bulk", response_model=TodoBulkCreateResponse, status_code=status.HTTP_201_CREATED)
+async def bulk_create_todos(data: TodoBulkCreateRequest, _: str = Depends(verify_token)):
+    """Create multiple TODOs at once."""
+    async with get_db() as db:
+        todos = await todo_service.bulk_create_todos(db, data.todos)
+        return TodoBulkCreateResponse(todos=todos, count=len(todos))
 
 
 @router.get("", response_model=TodoListResponse)

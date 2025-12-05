@@ -61,3 +61,16 @@ class PurgeResponse(BaseModel):
 
     message: str
     count: int
+
+
+class TodoBulkCreateRequest(BaseModel):
+    """Schema for bulk creating TODOs."""
+
+    todos: List[TodoCreate] = Field(..., min_length=1)
+
+
+class TodoBulkCreateResponse(BaseModel):
+    """Schema for bulk create response."""
+
+    todos: List[TodoResponse]
+    count: int

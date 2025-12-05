@@ -170,3 +170,14 @@ async def purge_deleted(db: aiosqlite.Connection) -> int:
     await db.commit()
 
     return count
+
+
+async def bulk_create_todos(
+    db: aiosqlite.Connection, todos_data: List[TodoCreate]
+) -> List[TodoResponse]:
+    """Create multiple TODOs at once."""
+    created_todos = []
+    for data in todos_data:
+        todo = await create_todo(db, data)
+        created_todos.append(todo)
+    return created_todos

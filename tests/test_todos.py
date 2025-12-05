@@ -72,6 +72,111 @@ class TestCreateTodo:
         assert response.status_code == 422
 
 
+class TestBulkCreateTodos:
+    @pytest.mark.asyncio
+    async def test_bulk_create_multiple_todos(self, test_client):
+        """Test creating multiple TODOs at once."""
+        response = await test_client.post(
+            "/todos/bulk",
+            json={
+                "todos": [
+                    {"description": "First bulk todo", "priority": 1},
+                    {"description": "Second bulk todo", "priority": 2},
+                    {"description": "Third bulk todo", "priority": 3},
+                ]
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert "todos" in data
+        assert "count" in data
+        assert data["count"] == 3
+        assert len(data["todos"]) == 3
+        assert data["todos"][0]["description"] == "First bulk todo"
+        assert data["todos"][1]["description"] == "Second bulk todo"
+        assert data["todos"][2]["description"] == "Third bulk todo"
+
+    @pytest.mark.asyncio
+    async def test_bulk_create_single_todo(self, test_client):
+        """Test bulk create with a single TODO."""
+        response = await test_client.post(
+            "/todos/bulk",
+            json={
+                "todos": [
+                    {"description": "Single bulk todo", "priority": 2},
+                ]
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["count"] == 1
+        assert len(data["todos"]) == 1
+
+    @pytest.mark.asyncio
+    async def test_bulk_create_with_all_fields(self, test_client):
+        """Test bulk create with all optional fields."""
+        response = await test_client.post(
+            "/todos/bulk",
+            json={
+                "todos": [
+                    {
+                        "description": "Full todo",
+                        "due_date_text": "tomorrow",
+                        "due_date": "2025-01-15",
+                        "notes": "Important notes",
+                        "priority": 1,
+                        "gcal_event_id": "gcal123",
+                    },
+                ]
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        todo = data["todos"][0]
+        assert todo["description"] == "Full todo"
+        assert todo["due_date_text"] == "tomorrow"
+        assert todo["due_date"] == "2025-01-15"
+        assert todo["notes"] == "Important notes"
+        assert todo["priority"] == 1
+        assert todo["gcal_event_id"] == "gcal123"
+
+    @pytest.mark.asyncio
+    async def test_bulk_create_empty_list_fails(self, test_client):
+        """Test that bulk create with empty list fails validation."""
+        response = await test_client.post(
+            "/todos/bulk",
+            json={"todos": []},
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_bulk_create_invalid_todo_fails(self, test_client):
+        """Test that bulk create fails if any TODO is invalid."""
+        response = await test_client.post(
+            "/todos/bulk",
+            json={
+                "todos": [
+                    {"description": "Valid todo"},
+                    {"description": ""},  # Invalid - empty description
+                ]
+            },
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_bulk_create_invalid_priority_fails(self, test_client):
+        """Test that bulk create fails with invalid priority."""
+        response = await test_client.post(
+            "/todos/bulk",
+            json={
+                "todos": [
+                    {"description": "Valid todo", "priority": 5},  # Invalid priority
+                ]
+            },
+        )
+        assert response.status_code == 422
+
+
 class TestListTodos:
     @pytest.mark.asyncio
     async def test_list_all_todos(self, test_client, sample_todo):
